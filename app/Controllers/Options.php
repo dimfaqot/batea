@@ -4,6 +4,14 @@ namespace App\Controllers;
 
 class Options extends BaseController
 {
+    function __construct()
+    {
+        if (!session('id')) {
+            session()->setFlashdata('gagal', "Ligin first");
+            header("Location: " . base_url());
+            die;
+        }
+    }
     public function index(): string
     {
         $data = db(menu()['tabel'])->orderBy("kategori", "ASC")->get()->getResultArray();

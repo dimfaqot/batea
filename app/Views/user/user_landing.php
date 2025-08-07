@@ -1,4 +1,4 @@
-<?= $this->extend('templates/guest') ?>
+<?= $this->extend('templates/logged') ?>
 
 <?= $this->section('content') ?>
 

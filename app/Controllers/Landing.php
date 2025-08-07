@@ -6,6 +6,9 @@ class Landing extends BaseController
 {
     public function index(): string
     {
-        return view('landing');
+        if (session('id')) {
+            sukses(base_url("home"), "You are logged");
+        }
+        return view('guest/landing', ['judul' => "Batea"]);
     }
 }

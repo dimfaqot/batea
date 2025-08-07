@@ -98,7 +98,11 @@ function url()
 
 function user()
 {
-    return db('user')->where('id', 1)->get()->getRowArray();
+    $res = false;
+    if (session('id')) {
+        $res = db('user')->where('id', session('id'))->get()->getRowArray();
+    }
+    return $res;
 }
 
 function menus()
@@ -134,8 +138,10 @@ function menus()
 
 function menu($controller = null)
 {
+    $controller = ($controller == "" ? url() : $controller);
     $controller = ($controller == null ? url() : $controller);
-    $q = db('menu')->where('role', user()['role'])->where('controller', $controller)->get()->getRowArray();
+
+    $q = db('menu')->where('role', (user() ? user()['role'] : "Public"))->where('controller', $controller)->get()->getRowArray();
 
     if (!$q) {
         gagal(base_url("home"), "Access denied");

@@ -4,6 +4,14 @@ namespace App\Controllers;
 
 class Pengeluaran extends BaseController
 {
+    function __construct()
+    {
+        if (!session('id')) {
+            session()->setFlashdata('gagal', "Ligin first");
+            header("Location: " . base_url());
+            die;
+        }
+    }
     public function index(): string
     {
         $data = db(menu()['tabel'])->where('lokasi', user()['lokasi'])->orderBy("updated_at", "DESC")->get()->getResultArray();

@@ -13,6 +13,7 @@ $routes->post('/home/delete', 'Home::delete');
 $routes->get('/menu', 'Menu::index');
 $routes->post('/menu/add', 'Menu::add');
 $routes->post('/menu/edit', 'Menu::edit');
+$routes->post('/menu/copy', 'Menu::copy');
 
 $routes->get('/settings', 'Settings::index');
 $routes->post('/settings/add', 'Settings::add');
@@ -50,3 +51,5 @@ $routes->post('/hutang/kasir', 'Hutang::kasir');
 $routes->post('/hutang/bayar', 'Hutang::bayar');
 
 $routes->get('/guest/nota/(:any)', 'Guest::nota/$1');
+$routes->post('/guest/login', 'Guest::login');
+$routes->get('/guest/logout', 'Guest::logout');

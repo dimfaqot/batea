@@ -4,6 +4,14 @@ namespace App\Controllers;
 
 class Menu extends BaseController
 {
+    function __construct()
+    {
+        if (!session('id')) {
+            session()->setFlashdata('gagal', "Ligin first");
+            header("Location: " . base_url());
+            die;
+        }
+    }
     public function index(): string
     {
         $data = db(menu()['tabel'])->orderBy("urutan", "ASC")->get()->getResultArray();
@@ -69,5 +77,35 @@ class Menu extends BaseController
         db(menu()['tabel'])->where('id', $id)->update($q)
             ? sukses(base_url(menu()['controller']), 'Sukses')
             : gagal(base_url(menu()['controller']), 'Gagal');
+    }
+    public function copy()
+    {
+        $menu_id = clear($this->request->getVar('menu_id'));
+        $role = clear($this->request->getVar('role'));
+
+        $q = db(menu()['tabel'])->where('id', $menu_id)->get()->getRowArray();
+
+        if (!$q) {
+            gagal_js("Id menu not found");
+        }
+
+        $exist = db(menu()['tabel'])->where('role', $role)->where("menu", $q['menu'])->get()->getRowArray();
+
+        if ($exist) {
+            gagal_js("Menu exits in role");
+        }
+
+
+        $q['role'] = $role;
+
+        // Dapatkan urutan terakhir
+        $last = db(menu()['tabel'])->select('urutan')->orderBy('urutan', 'DESC')->get()->getRowArray();
+        $q['urutan'] = isset($last['urutan']) ? $last['urutan'] + 1 : 1;
+        unset($q['id']);
+
+        // Simpan data
+        db(menu()['tabel'])->insert($q)
+            ? sukses_js('Sukses')
+            : gagal_js('Gagal');
     }
 }

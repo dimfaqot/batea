@@ -1,4 +1,4 @@
-<?= $this->extend('templates/guest') ?>
+<?= $this->extend('templates/logged') ?>
 
 <?= $this->section('content') ?>
 
@@ -15,7 +15,8 @@
         <div class="card-body d-flex justify-content-between ps-4">
             <div class="text-secondary"><small><?= $i['role']; ?></small></div>
             <div>
-                <button class="btn btn-sm btn-light me-2 form_input" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
+                <button class="btn btn-sm btn-outline-warning copy" data-role="<?= $i['role']; ?>" data-menu="<?= $i['menu']; ?>" data-id="<?= $i['id']; ?>">Copy</button>
+                <button class="btn btn-sm btn-light mx-2 form_input" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
                 <button class="btn btn-sm btn-danger delete" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
             </div>
         </div>
@@ -25,6 +26,7 @@
 <script>
     let form_input = (order, id) => {
         let roles = <?= json_encode(options("Role")); ?>;
+        let role = $(this).data("role");
 
         let data = {};
         if (order == "Edit") {
@@ -102,6 +104,56 @@
         canvas.show();
 
 
+    });
+    $(document).on('click', '.copy', function(e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        let role = $(this).data("role");
+        let menu = $(this).data("menu");
+        let roles = <?= json_encode(options("Role")); ?>;
+
+        let html = build_html("Copy " + menu);
+
+        html += `<div class="container">
+                    <div class="form-floating mb-3">
+                        <select class="form-select copy_role">
+                            <option selected value="">Pilih Role</option>`;
+        roles.forEach(e => {
+            if (role !== e.value) {
+                html += `<option value="${e.value}">${e.value}</option>`;
+            }
+        })
+        html += `</select>
+                        <label for="floatingSelect">Works with selects</label>
+                    </div>        
+                    <div class="d-grid"><button data-menu_id="${id}" class="btn btn-lg btn-secondary btn_copy"><i class="fa-solid fa-copy"></i> Copy</button></div>
+                </div>`;
+
+
+        $(".body_modal").html(html);
+        loading("close");
+        modal.show();
+
+
+    });
+    $(document).on('click', '.btn_copy', function(e) {
+        e.preventDefault();
+        let menu_id = $(this).data("menu_id");
+        let role = $(".copy_role").val();
+
+        post("menu/copy", {
+            menu_id,
+            role
+        }).then(res => {
+            loading("close");
+            message(res.status, res.message);
+
+            if (res.status == "200") {
+                setTimeout(() => {
+                    location.reload();
+                }, 1200);
+            }
+        })
     });
 </script>
 <?= $this->endSection() ?>
