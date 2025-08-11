@@ -135,49 +135,6 @@ class Transaksi extends BaseController
             : gagal_js("Gagal");
     }
 
-    public function edit()
-    {
-        $id = clear($this->request->getVar('id'));
-        $barang_id = clear($this->request->getVar('barang_id'));
-        $harga = angka_to_int(clear($this->request->getVar('harga')));
-        $qty = angka_to_int(clear($this->request->getVar('qty')));
-        $diskon = angka_to_int(clear($this->request->getVar('diskon')));
-        $pj = upper_first(clear($this->request->getVar('pj')));
-
-        $q = db(menu()['tabel'])->where('id', $id)->get()->getRowArray();
-
-        if (!$q) {
-            gagal(base_url(menu()['controller']), "Id not found");
-        }
-
-        $barang = db('barang')->where('id', $barang_id)->get()->getRowArray();
-
-        if (!$barang) {
-            gagal(base_url(menu()['controller']), "Barang not found");
-        }
-        if ($diskon > ($harga * $qty)) {
-            gagal(base_url(menu()['controller']), "Diskon over");
-        }
-
-
-        $q = [
-            'jenis' => $barang['jenis'],
-            'barang' => $barang['barang'],
-            'barang_id' => $barang['id'],
-            'harga'       => angka_to_int(clear($this->request->getVar('harga'))),
-            'qty'       => $qty,
-            'total'       => $harga * $qty,
-            'diskon'       => $diskon,
-            'biaya'       => ($harga * $qty) - $diskon,
-            'pj'       => $pj,
-            'updated_at' => time()
-        ];
-
-        // Simpan data
-        db(menu()['tabel'])->where('id', $id)->update($q)
-            ? sukses(base_url(menu()['controller']), 'Sukses')
-            : gagal(base_url(menu()['controller']), 'Gagal');
-    }
 
     public function cari_user()
     {
@@ -208,5 +165,33 @@ class Transaksi extends BaseController
         db("user")->insert($input)
             ? sukses_js('Sukses')
             : gagal_js('Gagal');
+    }
+
+    public function list()
+    {
+        $tahun = clear($this->request->getVar('tahun'));
+        $bulan = clear($this->request->getVar('bulan'));
+        $jenis = clear($this->request->getVar('jenis'));
+
+        // Query total biaya
+        $total = db(strtolower($jenis))
+            ->selectSum('biaya')
+            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
+            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
+            ->get()
+            ->getRowArray();
+
+
+        // Query data detail
+        $data = db(strtolower($jenis))
+            ->select('*')
+            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
+            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
+            ->orderBy('tgl', 'DESC')
+            ->get()
+            ->getResultArray();
+
+
+        sukses_js("Ok", $data, $total['biaya']);
     }
 }

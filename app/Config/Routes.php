@@ -27,6 +27,9 @@ $routes->get('/options', 'Options::index');
 $routes->post('/options/add', 'Options::add');
 $routes->post('/options/edit', 'Options::edit');
 
+$routes->get('/profile', 'Profile::index');
+$routes->post('/profile/edit', 'Profile::edit');
+
 $routes->get('/barang', 'Barang::index');
 $routes->post('/barang/add', 'Barang::add');
 $routes->post('/barang/edit', 'Barang::edit');
@@ -34,15 +37,16 @@ $routes->post('/barang/edit', 'Barang::edit');
 $routes->get('/pengeluaran', 'Pengeluaran::index');
 $routes->post('/pengeluaran/add', 'Pengeluaran::add');
 $routes->post('/pengeluaran/edit', 'Pengeluaran::edit');
+$routes->post('/pengeluaran/list', 'Pengeluaran::list');
 
 $routes->get('/transaksi', 'Transaksi::index');
 $routes->post('/transaksi/add', 'Transaksi::add');
-$routes->post('/transaksi/edit', 'Transaksi::edit');
 $routes->post('/transaksi/pembayaran', 'Transaksi::pembayaran');
 $routes->post('/transaksi/cari_user', 'Transaksi::cari_user');
 $routes->post('/transaksi/cari_barang', 'Transaksi::cari_barang');
 $routes->post('/transaksi/add_user', 'Transaksi::add_user');
 $routes->post('/transaksi/add_hutang', 'Transaksi::add_hutang');
+$routes->post('/transaksi/list', 'Transaksi::list');
 
 $routes->get('/hutang', 'Hutang::index');
 $routes->post('/hutang/detail', 'Hutang::detail');
@@ -53,3 +57,9 @@ $routes->post('/hutang/bayar', 'Hutang::bayar');
 $routes->get('/guest/nota/(:any)', 'Guest::nota/$1');
 $routes->post('/guest/login', 'Guest::login');
 $routes->get('/guest/logout', 'Guest::logout');
+
+$routes->get('/inv', 'Inv::index');
+$routes->post('/inv/add', 'Inv::add');
+$routes->post('/inv/edit', 'Inv::edit');
+$routes->post('/inv/edit', 'Inv::edit');
+$routes->post('/inv/list', 'Inv::list');
