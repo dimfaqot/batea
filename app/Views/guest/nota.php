@@ -98,7 +98,9 @@
             </tr>
 
         </table>
+
     </div>
+    <div style="text-align: center;">- Terima Kasih -</div>
 
 </body>
 
