@@ -10,10 +10,10 @@ class Guest extends BaseController
 
         $set = [
             'mode' => 'utf-8',
-            'format' => [70, 160],
+            'format' => [75, 160],
             'orientation' => 'P',
             'margin_left' => 0,
-            'margin_right' => 0,
+            'margin_right' => 10,
             'margin_top' => 0,
             'margin_bottom' => 20
         ];

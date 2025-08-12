@@ -8,7 +8,7 @@
     <style>
         td,
         th {
-            font-size: 14px;
+            font-size: 15px;
             padding: 2px;
         }
     </style>
