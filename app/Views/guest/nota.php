@@ -68,7 +68,7 @@
         td.price,
         td.qty,
         td.total {
-            font-size: 23px;
+            font-size: 29px;
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
@@ -79,7 +79,7 @@
     </style>
 </head>
 
-<body style="font-size:23px;">
+<body style="font-size:29px;">
     <div class="receipt">
         <div class="header">
             <h1>BATEA</h1>
