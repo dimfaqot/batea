@@ -96,7 +96,7 @@
 
         <div class="line"></div>
 
-        <table>
+        <table style="font-size: 11px;">
             <thead>
                 <tr>
                     <th>Barang</th>
