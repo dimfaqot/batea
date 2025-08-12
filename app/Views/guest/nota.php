@@ -78,7 +78,7 @@
     </style>
 </head>
 
-<body style="font-size: 25px;">
+<body style="font-size: 30px;">
     <div class="receipt">
         <div class="header">
             <h1>BATEA</h1>
@@ -151,7 +151,7 @@
         </table>
 
         <div class="footer" style="text-align: center;margin-top:10px">
-            * Terima kasih atas kunjungan anda *
+            * Terima kasih *
         </div>
     </div>
 </body>
