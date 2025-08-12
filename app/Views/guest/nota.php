@@ -68,7 +68,7 @@
         td.price,
         td.qty,
         td.total {
-            font-size: 25px;
+            font-size: 12px;
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
@@ -79,7 +79,7 @@
     </style>
 </head>
 
-<body style="font-size:25px;">
+<body style="font-size:12px;">
     <div class="receipt">
         <div class="header">
             <h1>BATEA</h1>
@@ -88,7 +88,7 @@
 
         <div class="line"></div>
 
-        <div class="info" style="font-size:25px;">
+        <div class="info" style="font-size:12px;">
             <div><b>Nota:</b> <?= $no_nota; ?> [<?= $data[0]['lokasi']; ?>]</div>
             <div><b>Kasir:</b> <?= $data[0]['petugas']; ?></div>
             <div><b>Tgl:</b> <?= date("d-m-Y H:i:s"); ?></div>
@@ -151,7 +151,7 @@
             </tfoot>
         </table>
 
-        <div class="footer" style="text-align: center;margin-top:10px;font-size:25px">
+        <div class="footer" style="text-align: center;margin-top:10px;font-size:12px">
             * Terima kasih *
         </div>
     </div>
