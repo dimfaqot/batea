@@ -15,7 +15,7 @@ class Guest extends BaseController
             'margin_left' => 0,
             'margin_right' => 0,
             'margin_top' => 0,
-            'margin_bottom' => 100
+            'margin_bottom' => 20
         ];
 
         $data = db('nota')->where('no_nota', $no_nota)->get()->getResultArray();
