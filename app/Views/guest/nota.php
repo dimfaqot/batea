@@ -96,7 +96,9 @@
                 <td>Kembalian</td>
                 <td colspan="2" style="text-align: right;"><?= angka($data[0]['uang'] - $total); ?></td>
             </tr>
-
+            <tr>
+                <td colspan="4" style="border-top:1px solid grey"></td>
+            </tr>
         </table>
 
     </div>
