@@ -10,12 +10,12 @@ class Guest extends BaseController
 
         $set = [
             'mode' => 'utf-8',
-            'format' => [120, 260],
+            'format' => [120, 200],
             'orientation' => 'P',
             'margin_left' => 0,
             'margin_right' => 0,
             'margin_top' => 0,
-            'margin_bottom' => 0
+            'margin_bottom' => 100
         ];
 
         $data = db('nota')->where('no_nota', $no_nota)->get()->getResultArray();
