@@ -82,7 +82,7 @@
 <body style="font-size:12px;">
     <div class="receipt">
         <div class="header">
-            <h1 style="font-size: 12px;">BATEA</h1>
+            <h1 style="font-size: 18px;">BATEA</h1>
             <p style="font-size: 10px;">Karangmalang Sragen Jawa Tengah<br />0857-4661-6165</p>
         </div>
 
