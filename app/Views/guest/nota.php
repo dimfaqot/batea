@@ -83,7 +83,7 @@
     <div class="receipt">
         <div class="header">
             <h1>BATEA</h1>
-            <p>Karangmalang Sragen Jawa Tengah<br />0857-4661-6165</p>
+            <p style="font-size: 22px;">Karangmalang Sragen Jawa Tengah<br />0857-4661-6165</p>
         </div>
 
         <div class="line"></div>
