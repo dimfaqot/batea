@@ -78,7 +78,7 @@
     </style>
 </head>
 
-<body style="font-size: 18px;">
+<body style="font-size: 25px;">
     <div class="receipt">
         <div class="header">
             <h1>BATEA</h1>
