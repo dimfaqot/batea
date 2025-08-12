@@ -8,20 +8,20 @@
     <style>
         td,
         th {
-            font-size: small;
-            padding: 3px;
+            font-size: 13px;
+            padding: 2px;
         }
     </style>
 </head>
 
-<body style="font-size:16px;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">
+<body style="font-size:16px;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;padding:0px;">
     <div style="text-align: center;margin-bottom:20px">
         <div style="font-weight: bold;font-size:26px"><?= strtoupper(profile()['nama']); ?></div>
         <div style="font-size:x-small;">Karangmalang Sragen Jawa Tengah</div>
         <div style="font-size: x-small;">0857-4661-6165</div>
     </div>
-    <div style="text-align: center;">
-        <table style="margin: 0 auto;">
+    <div style="padding: 0; margin: 0;">
+        <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <td style="width: 4px;">Nota</td>
                 <td style="width: 2px;">:</td>
@@ -39,7 +39,7 @@
                 <td><?= $data[0]['petugas']; ?></td>
             </tr>
         </table>
-        <table style="margin: 0 auto;">
+        <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <td colspan="4" style="padding-top: 10px;border-bottom:1px solid grey"></td>
             </tr>
