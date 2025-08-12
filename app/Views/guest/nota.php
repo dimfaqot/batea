@@ -88,7 +88,7 @@
 
         <div class="line"></div>
 
-        <div class="info">
+        <div class="info" style="font-size:25px;">
             <div><b>Nota:</b> <?= $no_nota; ?> [<?= $data[0]['lokasi']; ?>]</div>
             <div><b>Kasir:</b> <?= $data[0]['petugas']; ?></div>
             <div><b>Tgl:</b> <?= date("d-m-Y H:i:s"); ?></div>
@@ -151,7 +151,7 @@
             </tfoot>
         </table>
 
-        <div class="footer" style="text-align: center;margin-top:10px">
+        <div class="footer" style="text-align: center;margin-top:10px;font-size:25px">
             * Terima kasih *
         </div>
     </div>
