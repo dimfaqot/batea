@@ -8,7 +8,7 @@
     <style>
         td,
         th {
-            font-size: 15px;
+            font-size: 16px;
             padding: 2px;
         }
     </style>
@@ -17,8 +17,8 @@
 <body style="font-size:16px;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;padding:0px;">
     <div style="text-align: center;margin-bottom:20px">
         <div style="font-weight: bold;font-size:26px"><?= strtoupper(profile()['nama']); ?></div>
-        <div style="font-size:x-small;">Karangmalang Sragen Jawa Tengah</div>
-        <div style="font-size: x-small;">0857-4661-6165</div>
+        <div style="font-size:small;">Karangmalang Sragen Jawa Tengah</div>
+        <div style="font-size: small;">0857-4661-6165</div>
     </div>
     <div style="padding: 0px; margin: 0;">
         <table style="width: 100%; border-collapse: collapse;">
