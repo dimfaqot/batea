@@ -8,7 +8,7 @@
     <style>
         td,
         th {
-            font-size: 13px;
+            font-size: 14px;
             padding: 2px;
         }
     </style>
@@ -20,7 +20,7 @@
         <div style="font-size:x-small;">Karangmalang Sragen Jawa Tengah</div>
         <div style="font-size: x-small;">0857-4661-6165</div>
     </div>
-    <div style="padding: 0; margin: 0;">
+    <div style="padding: 0px 40px 0px 0px; margin: 0;">
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <td style="width: 4px;">Nota</td>
