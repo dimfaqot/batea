@@ -100,7 +100,7 @@
         </table>
 
     </div>
-    <div style="text-align: center;margin-top:10px">- Terima Kasih -</div>
+    <div style="text-align: center;margin-top:20px">- Terima Kasih -</div>
 
 </body>
 
