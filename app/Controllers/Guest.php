@@ -13,7 +13,7 @@ class Guest extends BaseController
             'format' => [95, 160],
             'orientation' => 'P',
             'margin_left' => 0,
-            'margin_right' => 10,
+            'margin_right' => 9,
             'margin_top' => 0,
             'margin_bottom' => 20
         ];
