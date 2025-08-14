@@ -62,8 +62,14 @@
         html += `<div class="form-floating mb-3">
                         <input type="text" name="harga" ${(order=="Edit"?'value="'+angka(data.harga)+'"':"")} class="form-control bg-dark text-light angka" placeholder="Harga Jual" required>
                         <label class="text-secondary">Harga Jual</label>
-                    </div>
-                    <div class="d-grid">
+                    </div>`;
+        html += ` <div class="my-3 border border-light rounded p-2 d-flex justify-content-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" name="tipe" type="checkbox" role="switch" ${(order=="Edit"?(data.tipe=="Mix"?"checked":""):"")}>
+                            <label class="form-check-label">Mix</label>
+                        </div>
+                    </div>`;
+        html += `<div class="d-grid">
                         <button type="submit" class="btn btn-outline-info">Simpan</button>
                     </div>`
 

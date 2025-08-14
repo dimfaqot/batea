@@ -58,9 +58,11 @@ class Transaksi extends BaseController
                 gagal_js("Id " . $i['barang'] . " not found");
             }
 
-            $barang['qty'] -= (int)$i['qty'];
-            if (!db('barang')->where('id', $barang['id'])->update($barang)) {
-                gagal_js("Update stok gagal");
+            if ($barang['tipe'] !== "Mix") {
+                $barang['qty'] -= (int)$i['qty'];
+                if (!db('barang')->where('id', $barang['id'])->update($barang)) {
+                    gagal_js("Update stok gagal");
+                }
             }
 
             if (!$db->table('nota')->insert([
@@ -123,8 +125,12 @@ class Transaksi extends BaseController
             if (!$barang) {
                 gagal_js("Id " . $i['barang'] . " not found");
             }
-            $barang['qty'] -= (int)$i['qty'];
-            db('barang')->where('id', $barang['id'])->update($barang);
+            if ($barang['tipe'] !== "Mix") {
+                $barang['qty'] -= (int)$i['qty'];
+                if (!db('barang')->where('id', $barang['id'])->update($barang)) {
+                    gagal_js("Update stok gagal");
+                }
+            }
         }
 
 

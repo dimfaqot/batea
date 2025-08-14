@@ -19,10 +19,13 @@ class Barang extends BaseController
     }
     public function add()
     {
+        $tipe = (clear($this->request->getVar('tipe')) == "on" ? "Mix" : "Count");
         $input = [
             'jenis'      => angka_to_int(clear($this->request->getVar('jenis'))),
             'barang'       => upper_first(clear($this->request->getVar('barang'))),
             'qty'       => 0,
+            'tipe'       => $tipe,
+            'lokasi' => user()['lokasi'],
             'harga'      => angka_to_int(clear($this->request->getVar('harga')))
         ];
 
@@ -51,10 +54,12 @@ class Barang extends BaseController
         if (!$q) {
             gagal(base_url(menu()['controller']), "Id not found");
         }
-
+        $tipe = (clear($this->request->getVar('tipe')) == "on" ? "Mix" : "Count");
         $q = [
             'jenis'      => angka_to_int(clear($this->request->getVar('jenis'))),
             'barang'       => upper_first(clear($this->request->getVar('barang'))),
+            'tipe'       => $tipe,
+            'lokasi' => user()['lokasi'],
             'harga'      => angka_to_int(clear($this->request->getVar('harga')))
         ];
 

@@ -71,7 +71,7 @@ class Pengeluaran extends BaseController
             'updated_at'       => time()
         ];
 
-        if ($barang['jenis'] !== "Kulakan") {
+        if ($barang['tipe'] !== "Mix") {
             $barang['qty'] += (int)$input['qty'];
             db('barang')->where('id', $barang['id'])->update($barang);
         }

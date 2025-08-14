@@ -236,6 +236,10 @@
     $(document).on('click', '.tambah_barang', function(e) {
         e.preventDefault();
 
+        if (barang_selected.id == undefined) {
+            message("400", "Barang kosong");
+            return;
+        }
         let cb = cari_biaya();
         if (parseInt(barang_selected.qty) < cb.qty) {
             blink("qty");
@@ -646,7 +650,7 @@
 
     });
 
-  $(document).on('keyup', '.cari', function(e) {
+    $(document).on('keyup', '.cari', function(e) {
         e.preventDefault();
         let value = $(this).val().toLowerCase();
         $('.tabel_search tr').filter(function() {
