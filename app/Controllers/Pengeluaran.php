@@ -71,7 +71,7 @@ class Pengeluaran extends BaseController
             'updated_at'       => time()
         ];
 
-        if ($barang['tipe'] !== "Mix") {
+        if ($barang['tipe'] == "Count") {
             $barang['qty'] += (int)$input['qty'];
             db('barang')->where('id', $barang['id'])->update($barang);
         }
@@ -107,7 +107,7 @@ class Pengeluaran extends BaseController
         if ($diskon > ($harga * $qty)) return gagal(base_url(menu()['controller']), "Diskon over");
 
         // Update stok jika qty berubah
-        if ($barang['jenis'] !== "Mix") {
+        if ($barang['jenis'] == "Count") {
             if ($data_lama['qty'] != $qty) {
                 $barang['qty'] = ($barang['qty'] - $data_lama['qty']) + $qty;
                 if (!db('barang')->where('id', $barang['id'])->update($barang)) {
