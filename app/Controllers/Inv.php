@@ -31,7 +31,7 @@ class Inv extends BaseController
         foreach ($datas as $i) {
             $db->table('pengeluaran')->insert([
                 'tgl' => $tgl,
-                'lokasi' => user()['lokasi'],
+                'lokasi' => (user()['role'] == "Root" ? "Pusat" : user()['lokasi']),
                 'jenis' => $jenis,
                 'barang' => upper_first($i['barang']),
                 'barang_id' => 0,
@@ -73,7 +73,7 @@ class Inv extends BaseController
             'biaya'       => angka_to_int(clear($this->request->getVar('biaya'))),
             'pj'       => upper_first(clear($this->request->getVar('pj'))),
             'petugas'       => user()['nama'],
-            'lokasi' => user()['lokasi'],
+            'lokasi' => (user()['role'] == "Root" ? "Pusat" : user()['lokasi']),
             'updated_at'       => time()
         ];
 
