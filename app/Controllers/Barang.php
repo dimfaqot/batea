@@ -14,7 +14,7 @@ class Barang extends BaseController
     }
     public function index(): string
     {
-        $data = db(menu()['tabel'])->orderBy("barang", "ASC")->get()->getResultArray();
+        $data = db(menu()['tabel'])->where('lokasi', user()['lokasi'])->orderBy("barang", "ASC")->get()->getResultArray();
         return view(menu()['controller'] . '/' . menu()['controller'] . "_" . 'landing', ['judul' => menu()['menu'], "data" => $data]);
     }
     public function add()
