@@ -35,7 +35,7 @@ class Barang extends BaseController
         }
 
         // Cek duplikat
-        if (db(menu()['tabel'])->where('barang', $input['barang'])->countAllResults() > 0) {
+        if (db(menu()['tabel'])->where('lokasi', user()['lokasi'])->where('barang', $input['barang'])->countAllResults() > 0) {
             gagal(base_url(menu()['controller']), 'Barang existed');
         }
 
@@ -68,7 +68,7 @@ class Barang extends BaseController
             $q['qty'] = $qty;
         }
 
-        if ((db(menu()['tabel'])->whereNotIn('id', [$id]))->where("barang", $q['barang'])->get()->getRowArray()) {
+        if ((db(menu()['tabel'])->whereNotIn('id', [$id]))->where("barang", $q['barang'])->where('lokasi', user()['lokasi'])->get()->getRowArray()) {
             gagal(base_url(menu()['controller']), "Barang existed");
         }
 
