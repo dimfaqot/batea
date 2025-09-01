@@ -173,4 +173,21 @@ class Pengeluaran extends BaseController
 
         sukses_js("Ok", $data, $total['biaya']);
     }
+
+    public function cari_barang()
+    {
+        $text = clear($this->request->getVar("text"));
+        $jenis = json_decode(json_encode($this->request->getVar("jenis")), true);
+        $val = db('barang')->whereIn('jenis', $jenis)->like("barang", $text, "both")->orderBy('barang', 'ASC')->limit(7)->get()->getResultArray();
+
+        $data = [];
+
+        foreach ($val as $i) {
+            if ($i['lokasi'] == user()['lokasi']) {
+                $data[] = $i;
+            }
+        }
+
+        sukses_js("Ok", $data);
+    }
 }
