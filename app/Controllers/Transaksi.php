@@ -60,7 +60,7 @@ class Transaksi extends BaseController
 
             if ($barang['tipe'] == "Count") {
                 $barang['qty'] -= (int)$i['qty'];
-                if (!db('barang')->where('id', $barang['id'])->update($barang)) {
+                if (!db('barang')->where('id', $barang['id'])->where('lokasi', user()['lokasi'])->update($barang)) {
                     gagal_js("Update stok gagal");
                 }
             }
@@ -127,7 +127,7 @@ class Transaksi extends BaseController
             }
             if ($barang['tipe'] == "Count") {
                 $barang['qty'] -= (int)$i['qty'];
-                if (!db('barang')->where('id', $barang['id'])->update($barang)) {
+                if (!db('barang')->where('id', $barang['id'])->where('lokasi', user()['lokasi'])->update($barang)) {
                     gagal_js("Update stok gagal");
                 }
             }

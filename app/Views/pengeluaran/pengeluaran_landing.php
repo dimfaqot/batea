@@ -133,8 +133,8 @@
         let id = $(this).data("id");
         let order = $(this).data("order");
         let body_class_list = $('.body_list_barang');
-        let barangs = <?= json_encode(barang()); ?>;
-
+        let barangs = <?= json_encode(barang(['Makanan', 'Minuman', 'Snack', 'Kulakan', 'Donasi'])); ?>;
+        console.log(text);
         if (text.length > 0) {
 
             let matchedProducts = barangs.filter(product =>
@@ -145,7 +145,7 @@
                 let html = '';
                 matchedProducts.forEach(e => {
                     html += `
-                        <div class="list_barang" data-barang_id="${e.id}" data-order="${order}" data-id="${id}">
+                        <div class="list_barang" data-barang_id="${e.id}" data-jenis="${e.jenis}" data-harga="${e.harga}" data-order="${order}" data-id="${id}">
                             <div class="d-flex justify-content-between">
                                 <span class="nama_barang_${e.id}">${e.barang}</span>
                                 <span class="text-muted">${angka(e.harga)} [${angka(e.qty)}]</span>
@@ -167,6 +167,8 @@
         const id = $(this).data("id");
         const order = $(this).data("order");
         const barang_id = $(this).data("barang_id");
+        const jenis = $(this).data("jenis");
+        const hrg = $(this).data("harga");
         const nama_barang = $(".nama_barang_" + barang_id).text();
 
         $(".barang").val(nama_barang);
@@ -181,7 +183,7 @@
         }
 
         let harga = $(".harga").val();
-        $(".harga").val((harga == "" ? 0 : harga));
+        $(".harga").val((harga == "" ? 0 : (jenis == "Kulakan" ? hrg : harga)));
         let qty = $(".qty").val();
         $(".qty").val((qty == "" ? 1 : qty));
         let diskon = $(".diskon").val();
