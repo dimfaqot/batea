@@ -241,10 +241,13 @@
             return;
         }
         let cb = cari_biaya();
-        if (parseInt(barang_selected.qty) < cb.qty) {
-            blink("qty");
-            message("400", "Stok kurang");
-            return;
+        if (barang_selected.tipe !== "Mix") {
+            if (parseInt(barang_selected.qty) < cb.qty) {
+                blink("qty");
+                message("400", "Stok kurang");
+                return;
+            }
+
         }
         if (cb.diskon > (cb.harga * cb.qty)) {
             message("400", "Diskon over");
