@@ -151,6 +151,7 @@ class Pengeluaran extends BaseController
         // Query total biaya
         $total = db('pengeluaran')
             ->selectSum('biaya')
+            ->where('lokasi', user()['lokasi'])
             ->whereNotIn('jenis', ["Inv", "modal"])
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
@@ -161,6 +162,7 @@ class Pengeluaran extends BaseController
         // Query data detail
         $data = db('pengeluaran')
             ->select('*')
+            ->where('lokasi', user()['lokasi'])
             ->whereNotIn('jenis', ["Inv", "modal"])
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
