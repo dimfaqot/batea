@@ -595,7 +595,7 @@
                 <h4 class="text-center bg-secondary p-2">-[ ${angka(total)} ]-</h4>
 
                 <input class="form-control form-control-sm bg-dark text-light cari mb-2" placeholder="Cari">
-                    <table class="table table-sm table-dark" style="font-size:12px">
+                    <table class="table table-sm table-dark" style="font-size:12px;max-height:300px;overflow-y:auto">
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
