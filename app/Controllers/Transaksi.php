@@ -179,25 +179,14 @@ class Transaksi extends BaseController
         $bulan = clear($this->request->getVar('bulan'));
         $jenis = clear($this->request->getVar('jenis'));
 
-        // Query total biaya
-        $total = db(strtolower($jenis))
+        $data = db(strtolower($jenis))->select('*')
             ->where('lokasi', user()['lokasi'])
             ->selectSum('biaya')
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
             ->get()
-            ->getRowArray();
-
-
-        // Query data detail
-        $data = db(strtolower($jenis))
-            ->select('*')
-            ->where('lokasi', user()['lokasi'])
-            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
-            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
-            ->orderBy('tgl', 'DESC')
-            ->get()
             ->getResultArray();
+        $total = array_sum(array_column($data, 'biaya'));
 
 
         sukses_js("Ok", $data, $total['biaya']);
