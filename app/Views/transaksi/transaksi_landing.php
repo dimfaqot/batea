@@ -599,6 +599,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
+                                <th class="text-center">Lokasi</th>
                                 <th class="text-center">Tgl</th>
                                 <th class="text-center">Barang</th>
                                 <th class="text-center">Qty</th>
@@ -609,6 +610,7 @@
         data.forEach((e, i) => {
             html += `<tr>
                                 <th scope="row">${(i+1)}</th>
+                                <td class="text-start">${e.lokasi}</td>
                                 <td>${time_php_to_js(e.tgl)}</td>
                                 <td class="text-start">${e.barang}</td>
                                 <td>${angka(e.qty)}</td>
