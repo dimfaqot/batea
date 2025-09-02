@@ -188,6 +188,6 @@ class Transaksi extends BaseController
         $total = array_sum(array_column($data, 'biaya'));
 
 
-        sukses_js("Ok", $data, $total['biaya']);
+        sukses_js("Ok", $data, $total);
     }
 }
