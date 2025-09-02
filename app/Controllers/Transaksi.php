@@ -181,7 +181,6 @@ class Transaksi extends BaseController
 
         $data = db(strtolower($jenis))->select('*')
             ->where('lokasi', user()['lokasi'])
-            ->selectSum('biaya')
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
             ->get()
