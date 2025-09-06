@@ -148,30 +148,18 @@ class Pengeluaran extends BaseController
         $tahun = clear($this->request->getVar('tahun'));
         $bulan = clear($this->request->getVar('bulan'));
 
-        // Query total biaya
-        $total = db('pengeluaran')
-            ->selectSum('biaya')
-            ->where('lokasi', user()['lokasi'])
+        $data = db('pengeluaran')->select('*')
             ->whereNotIn('jenis', ["Inv", "modal"])
-            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
-            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
-            ->get()
-            ->getRowArray();
-
-
-        // Query data detail
-        $data = db('pengeluaran')
-            ->select('*')
             ->where('lokasi', user()['lokasi'])
-            ->whereNotIn('jenis', ["Inv", "modal"])
-            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
-            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
             ->orderBy('tgl', 'DESC')
+            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
+            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
             ->get()
             ->getResultArray();
+        $total = array_sum(array_column($data, 'biaya'));
 
 
-        sukses_js("Ok", $data, $total['biaya']);
+        sukses_js("Ok", $data, $total);
     }
 
     public function cari_barang()
