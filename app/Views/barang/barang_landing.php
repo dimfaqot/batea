@@ -13,7 +13,7 @@
             <div class="text-secondary"><small><?= ($i['jenis'] == "Kulakan" ? "-" : angka($i['harga']) . " [" . angka($i['qty']) . "]"); ?> [<?= $i['tipe']; ?>]</small></div>
             <div>
                 <button class="btn btn-sm btn-light me-2 form_input" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
-                <button class="btn btn-sm btn-danger delete" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
+                <button class="btn btn-sm btn-danger <?= (user()['role'] == "Root" ? "delete" : ""); ?>" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
             </div>
         </div>
     </div>
