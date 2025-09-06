@@ -27,8 +27,8 @@
         <div class="card-body d-flex justify-content-between ps-4">
             <div class="text-secondary"><small><?= ($i['jenis'] == "Kulakan" ? date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "] [" . angka($i['qty']) . "]" : date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "]"); ?></small></div>
             <div>
-                <button class="btn btn-sm btn-light me-2 form_input" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
-                <button class="btn btn-sm btn-danger delete" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
+                <button class="btn btn-sm btn-light me-2 <?= (user()['role' == "Root" ? "form_input" : ""]); ?>" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
+                <button class="btn btn-sm btn-danger <?= (user()['role'] == "Root" ? "delete" : ""); ?>" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
             </div>
         </div>
     </div>
