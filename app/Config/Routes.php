@@ -38,6 +38,7 @@ $routes->get('/pengeluaran', 'Pengeluaran::index');
 $routes->post('/pengeluaran/add', 'Pengeluaran::add');
 $routes->post('/pengeluaran/edit', 'Pengeluaran::edit');
 $routes->post('/pengeluaran/list', 'Pengeluaran::list');
+$routes->post('/pengeluaran/cari_barang', 'Pengeluaran::cari_barang');
 
 $routes->get('/transaksi', 'Transaksi::index');
 $routes->post('/transaksi/add', 'Transaksi::add');

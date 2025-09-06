@@ -11,7 +11,7 @@
     </div>
 
     <div class="p-2 flex-fill">
-        <div class="mb-1 text-center">PENELUARAN</div>
+        <div class="mb-1 text-center">PENGELUARAN</div>
         <div class="d-grid">
             <button class="btn btn-light lists"><i class="fa-solid fa-list"></i></button>
         </div>
@@ -134,7 +134,7 @@
         let order = $(this).data("order");
         let body_class_list = $('.body_list_barang');
         let barangs = <?= json_encode(barang(['Makanan', 'Minuman', 'Snack', 'Kulakan', 'Donasi'])); ?>;
-        post("transaksi/cari_barang", {
+        post("pengeluaran/cari_barang", {
             text,
             jenis: ["Makanan", "Minuman", "Snack", "Kulakan"]
         }, "No").then(res => {
