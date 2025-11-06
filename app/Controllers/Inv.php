@@ -20,27 +20,25 @@ class Inv extends BaseController
     public function add()
     {
         $datas = json_decode(json_encode($this->request->getVar('datas')), true);
-        $pj = upper_first(clear($this->request->getVar('pj')));
-        $jenis = upper_first(clear($this->request->getVar('jenis')));
 
         $db = \Config\Database::connect();
         $db->transStart();
-
+        $lokasi = user()['lokasi'];
         $tgl = time();
 
         foreach ($datas as $i) {
             $db->table('pengeluaran')->insert([
                 'tgl' => $tgl,
-                'lokasi' => (user()['role'] == "Root" ? "Pusat" : user()['lokasi']),
-                'jenis' => $jenis,
-                'barang' => upper_first($i['barang']),
+                'jenis' => $i['jenis'],
+                'barang' => $i['barang'],
+                'lokasi' => $lokasi,
                 'barang_id' => 0,
                 'harga'     => angka_to_int($i['harga']),
                 'qty'       => angka_to_int($i['qty']),
                 'total'       => angka_to_int($i['harga']) * angka_to_int($i['qty']),
                 'diskon'       => angka_to_int($i['diskon']),
                 'biaya'       => (angka_to_int($i['harga']) * angka_to_int($i['qty'])) - angka_to_int($i['diskon']),
-                'pj'       => $pj,
+                'pj'       => $i['pj'],
                 'petugas'       => user()['nama'],
                 'updated_at'       => $tgl
             ]);
@@ -55,6 +53,7 @@ class Inv extends BaseController
 
     public function edit()
     {
+        $lokasi = user()['lokasi'];
         $id = clear($this->request->getVar('id'));
 
         $q = db('pengeluaran')->where('id', $id)->get()->getRowArray();
@@ -65,7 +64,7 @@ class Inv extends BaseController
 
         $q = [
             'jenis'       => clear($this->request->getVar('jenis')),
-            'barang'       => upper_first(clear($this->request->getVar('barang'))),
+            'barang'       => clear($this->request->getVar('barang')),
             'harga'      => angka_to_int(clear($this->request->getVar('harga'))),
             'qty'       => angka_to_int(clear($this->request->getVar('qty'))),
             'total'       => angka_to_int(clear($this->request->getVar('total'))),
@@ -73,7 +72,6 @@ class Inv extends BaseController
             'biaya'       => angka_to_int(clear($this->request->getVar('biaya'))),
             'pj'       => upper_first(clear($this->request->getVar('pj'))),
             'petugas'       => user()['nama'],
-            'lokasi' => (user()['role'] == "Root" ? "Pusat" : user()['lokasi']),
             'updated_at'       => time()
         ];
 
@@ -82,28 +80,20 @@ class Inv extends BaseController
             $tahun = clear($this->request->getVar('tahun'));
             $bulan = clear($this->request->getVar('bulan'));
 
-            $total = db('pengeluaran')
-                ->selectSum('biaya')
-                ->where('jenis', 'Inv')
-                ->where('lokasi', user()['lokasi'])
-                ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
-                ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
-                ->get()
-                ->getRowArray();
-
             // Query data detail
-            $data = db('pengeluaran')
+            $data = db('pengeluaran')->select('*')
                 ->select('*')
-                ->where('jenis', 'Inv')
-                ->where('lokasi', user()['lokasi'])
+                ->where('lokasi', $lokasi)
+                ->where('jenis', "Inv")
                 ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
                 ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
                 ->orderBy('tgl', 'DESC')
                 ->get()
                 ->getResultArray();
+            $total = array_sum(array_column($data, 'biaya'));
 
 
-            sukses_js("Ok", $data, $total['biaya']);
+            sukses_js("Ok", $data, $total);
         } else {
             gagal_js("Ggaal");
         }
@@ -111,32 +101,32 @@ class Inv extends BaseController
 
     public function list()
     {
+        $lokasi = user()['lokasi'];
         $tahun = clear($this->request->getVar('tahun'));
         $bulan = clear($this->request->getVar('bulan'));
         $jenis = clear($this->request->getVar('jenis'));
 
-        // Query total biaya
-        $total = db('pengeluaran')
-            ->selectSum('biaya')
-            ->where('jenis', $jenis)
-            ->where('lokasi', user()['lokasi'])
-            ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
-            ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
-            ->get()
-            ->getRowArray();
+        $db = db('pengeluaran');
+        $db->select('*');
+        $db->where('lokasi', $lokasi);
+        if ($jenis == "All") {
+            $jenises = [];
+            foreach (options('Inv') as $i) {
+                $jenises[] = $i['value'];
+            }
+            $db->whereIn('jenis', $jenises);
+        } else {
+            $db->where('jenis', $jenis);
+        }
+        $data = $db->orderBy('tgl', 'DESC')
 
-        // Query data detail
-        $data = db('pengeluaran')
-            ->select('*')
-            ->where('jenis', $jenis)
-            ->where('lokasi', user()['lokasi'])
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
-            ->orderBy('tgl', 'DESC')
             ->get()
             ->getResultArray();
+        $total = array_sum(array_column($data, 'biaya'));
 
 
-        sukses_js("Ok", $data, $total['biaya']);
+        sukses_js("Ok", $data, $total);
     }
 }

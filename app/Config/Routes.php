@@ -9,6 +9,9 @@ $routes->get('/', 'Landing::index');
 
 $routes->get('/home', 'Home::index');
 $routes->post('/home/delete', 'Home::delete');
+$routes->post('/home/delete', 'Home::delete');
+$routes->post('/home/statistik', 'Home::statistik');
+$routes->post('/home/unlock', 'Home::unlock');
 
 $routes->get('/menu', 'Menu::index');
 $routes->post('/menu/add', 'Menu::add');
@@ -42,12 +45,17 @@ $routes->post('/pengeluaran/cari_barang', 'Pengeluaran::cari_barang');
 
 $routes->get('/transaksi', 'Transaksi::index');
 $routes->post('/transaksi/add', 'Transaksi::add');
-$routes->post('/transaksi/pembayaran', 'Transaksi::pembayaran');
+$routes->post('/transaksi/bayar', 'Transaksi::bayar');
 $routes->post('/transaksi/cari_user', 'Transaksi::cari_user');
 $routes->post('/transaksi/cari_barang', 'Transaksi::cari_barang');
 $routes->post('/transaksi/add_user', 'Transaksi::add_user');
 $routes->post('/transaksi/add_hutang', 'Transaksi::add_hutang');
 $routes->post('/transaksi/list', 'Transaksi::list');
+$routes->post('/transaksi/delete', 'Transaksi::delete');
+$routes->post('/transaksi/cashier', 'Transaksi::cashier');
+$routes->post('/transaksi/add_item', 'Transaksi::add_item');
+$routes->post('/transaksi/btn_add_item', 'Transaksi::btn_add_item');
+$routes->post('/transaksi/btn_cashier', 'Transaksi::btn_cashier');
 
 $routes->get('/hutang', 'Hutang::index');
 $routes->post('/hutang/detail', 'Hutang::detail');
@@ -55,12 +63,13 @@ $routes->post('/hutang/wa', 'Hutang::wa');
 $routes->post('/hutang/kasir', 'Hutang::kasir');
 $routes->post('/hutang/bayar', 'Hutang::bayar');
 
+$routes->get('/guest/laporan/(:any)/(:num)/(:num)', 'Guest::laporan/$1/$2/$3');
 $routes->get('/guest/nota/(:any)', 'Guest::nota/$1');
 $routes->post('/guest/login', 'Guest::login');
 $routes->get('/guest/logout', 'Guest::logout');
 
+
 $routes->get('/inv', 'Inv::index');
 $routes->post('/inv/add', 'Inv::add');
-$routes->post('/inv/edit', 'Inv::edit');
 $routes->post('/inv/edit', 'Inv::edit');
 $routes->post('/inv/list', 'Inv::list');

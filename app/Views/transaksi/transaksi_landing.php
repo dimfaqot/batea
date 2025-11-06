@@ -10,9 +10,15 @@
     </div>
 
     <div class="p-2 flex-fill">
-        <div class="mb-1 text-center">TRANSAKSI</div>
+        <div class="mb-1 text-center">BAYAR</div>
         <div class="d-grid">
-            <button class="btn btn-light lists" data-jenis="Transaksi"><i class="fa-solid fa-list"></i></button>
+            <button class="btn btn-light cashier"><i class="fa-solid fa-cash-register"></i></button>
+        </div>
+    </div>
+    <div class="p-2 flex-fill">
+        <div class="mb-1 text-center">DATA</div>
+        <div class="d-grid">
+            <button class="btn btn-light lists" data-jenis="All"><i class="fa-solid fa-list"></i></button>
         </div>
     </div>
 </div>
@@ -34,17 +40,17 @@
     <input type="text" class="form-control bg-dark text-light diskon angka cari_biaya" value="0">
     <label class="text-secondary">Diskon</label>
 </div>
-<div class="form-floating mb-3">
+<div class="form-floating mb-2">
     <input type="text" class="form-control bg-dark text-light border border-warning total" value="0" readonly>
     <label class="text-secondary">Total</label>
 </div>
-<div class="form-floating mb-3">
+<div class="form-floating mb-2">
     <input type="text" class="form-control bg-secondary opacity-50 text-light fw-bold border border-warning biaya" value="0" readonly>
     <label class="text-light">Biaya</label>
 </div>
 
 
-<div class="d-flex gap-2">
+<div class="d-flex gap-2 mt-2">
     <div class="flex-grow-1">
         <button class="btn btn-outline-warning tambah_barang" style="width: 100%;"><i class="fa-solid fa-box-open"></i> TAMBAH BARANG</button>
     </div>
@@ -71,6 +77,9 @@
     let barangs = [];
     let datas = [];
     let barang_selected = {};
+    let data_barang = <?= json_encode(db('barang')->whereNotIn('jenis', ['Kulakan'])->get()->getResultArray()); ?>;
+    let options = <?= json_encode(options('Kantin')); ?>;
+    let role = "<?= user()['role']; ?>";
     $(document).on('keyup', '.cari_barang', function(e) {
         e.preventDefault();
         let text = $(this).val().toLowerCase();
@@ -141,9 +150,29 @@
             }
         })
 
-        if (parseInt(val.qty) < 1 && val.tipe != "Mix") {
-            message("400", "Stok kosong");
+        if (val.tipe == "Mix" && val.link !== "") {
+            let exp = val.link.split(",");
+            let links = [];
+            data_barang.forEach(e => {
+                exp.forEach(x => {
+                    if (e.barang == x) {
+                        if (parseInt(e.qty) <= 0) {
+                            links.push(e.barang);
+                        }
+                    }
+                })
+            })
+            if (links.length > 0) {
+                message("400", "Stok " + links.join(", ") + " kosong");
+                return;
+            }
+
+        }
+
+        if (val.tipe == "Count" && parseInt(val.qty) < 1) {
+            message("400", "Stok " + val.barang + " kosong");
             return;
+
         }
 
         $(".harga").val(angka(val.harga));
@@ -186,9 +215,9 @@
         let diskon = 0;
         let biaya = 0;
         datas.forEach(e => {
-            total += e.total;
-            diskon += e.diskon;
-            biaya += e.biaya;
+            total += parseInt(e.total);
+            diskon += parseInt(e.diskon);
+            biaya += parseInt(e.biaya);
         })
 
         let res = {
@@ -207,7 +236,16 @@
                 <td>${e.barang}</td>
                 <td>${angka(e.harga)}</td>
                 <td>${angka(e.qty)}</td>
-                <td><a href="" class="text-danger delete_item" data-barang_id="${e.id}" style="text-decoration:none"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                <td>`;
+            if (e.ket == "old") {
+                html += `<span class="text-secondary"><i class="fa-solid fa-hand"></i></span>`;
+
+            } else {
+                html += `<a href="" class="text-danger delete_item" data-barang_id="${e.id}" style="text-decoration:none"><i class="fa-solid fa-circle-xmark"></i></a>`;
+
+            }
+
+            html += `</td>
             </tr>`;
         })
 
@@ -233,27 +271,46 @@
         $(".super_total").val(angka(super_total().biaya));
         $(".cari_barang").focus();
     });
+
+
     $(document).on('click', '.tambah_barang', function(e) {
         e.preventDefault();
 
-        if (barang_selected.id == undefined) {
-            message("400", "Barang kosong");
-            return;
-        }
         let cb = cari_biaya();
-        if (barang_selected.tipe !== "Mix") {
-            if (parseInt(barang_selected.qty) < cb.qty) {
-                blink("qty");
-                message("400", "Stok kurang");
+
+        if (barang_selected.tipe == "Mix" && barang_selected.link !== "") {
+            let exp = barang_selected.link.split(",");
+            let links = [];
+            data_barang.forEach(e => {
+                exp.forEach(x => {
+                    if (e.barang == x) {
+                        if (parseInt(e.qty) < cb.qty) {
+                            links.push(e.barang);
+                        }
+                    }
+                })
+            })
+
+            if (links.length > 0) {
+                message("400", "Stok " + links.join(", ") + " kurang");
                 return;
             }
 
         }
+
+        if (barang_selected.tipe == "Count" && parseInt(barang_selected.qty) < 1) {
+            message("400", "Stok " + barang_selected.barang + " kurang");
+            return;
+
+        }
+
         if (cb.diskon > (cb.harga * cb.qty)) {
             message("400", "Diskon over");
             blink('diskon');
             return;
         }
+
+
         barang_selected["harga"] = cb.harga;
         barang_selected["qty"] = cb.qty;
         barang_selected["total"] = (cb.harga * cb.qty);
@@ -261,7 +318,6 @@
         barang_selected["biaya"] = (cb.harga * cb.qty) - cb.diskon;
 
         datas.push(barang_selected);
-
         $(".list_items").html(list_items());
         $(".super_total").val(angka(super_total().biaya));
         $(".cari_barang").focus();
@@ -300,18 +356,19 @@
         }
     });
 
-    const penghutang = (nama, wa, id) => {
+    const penghutang = (nama, wa, id, hutang) => {
+        let biaya = hutang + super_total().biaya;
         let html = `<div class="rounded bg-danger mb-2 p-2">
                         <h6 class="text-center">PENGHUTANG</h6>
                         <input type="hidden" class="form-control mb-2 id_hutang" value="${id}">
                         <input type="text" class="form-control mb-2 nama_hutang" value="${nama}">
-                        <input type="text" class="form-control wa_hutang" value="${wa}">
+                        <input type="text" class="form-control total_hutang" value="${angka(biaya)}">
                     </div>`;
-
+        $(".body_uang_pembayaran").remove();
         return html;
     }
 
-    const next = (super_total) => {
+    const next = (super_total, order) => {
         let html = ``;
         html += `<div class="border border-secondary rounded p-3">
                     <div class="input-group input-group-sm mb-3">
@@ -326,14 +383,15 @@
                         <span class="input-group-text" style="width: 100px;">TOTAL</span>
                         <input type="text" class="form-control" value="${angka(super_total.biaya)}">
                     </div>
-                   
+                   <div class="body_uang_pembayaran">
                     <h6 class="text-center">UANG PEMBAYARAN</h6>
                     <input class="form-control form-control-lg text-light text-center border border-light border-3 bg-success uang_pembayaran angka" value="${angka(super_total.biaya)}" value="0" type="text">
+                   </div>
                     
 
                     <div class="d-flex gap-2 mt-4 before_hutang">
                         <div class="flex-grow-1">
-                             <button class="btn btn-info btn_transaksi" style="width:100%"><i class="fa-solid fa-arrow-right-to-bracket"></i> BAYAR</button>
+                             <button class="btn btn-info btn_bayar" data-order="${order}" style="width:100%"><i class="fa-solid fa-arrow-right-to-bracket"></i> BAYAR</button>
                         </div>
                         <div>
                             <button class="btn btn-outline-info hutang" style="width: 115px;"><i class="fa-solid fa-face-frown"></i> HUTANG</button>
@@ -362,8 +420,9 @@
 
 
     });
-    $(document).on('click', '.btn_transaksi', function(e) {
+    $(document).on('click', '.btn_bayar', function(e) {
         e.preventDefault();
+        let order = $(this).data('order');
         let uang = $(".uang_pembayaran").val();
         uang = (uang == "" ? "0" : uang);
         uang = angka_to_int(uang);
@@ -373,9 +432,10 @@
             return;
         }
 
-        post("transaksi/pembayaran", {
+        post("transaksi/bayar", {
             uang,
             datas,
+            order,
             super_total: super_total()
         }).then(res => {
             loading("close");
@@ -442,6 +502,7 @@
     $(document).on('keyup', '.cari_user', function(e) {
         e.preventDefault();
         let text = $(this).val().toLowerCase();
+        let order = $(this).data("order");
         let body_class_list = $('.body_list_hasil');
 
         if (text == "") {
@@ -449,9 +510,10 @@
             return;
         }
 
+
+
         post("transaksi/cari_user", {
-            text,
-            roles: ["Member"]
+            text
         }, "No").then(res => {
             let users = res.data;
 
@@ -459,10 +521,10 @@
                 let html = '';
                 users.forEach(e => {
                     html += `
-                            <div class="list_hasil" data-hasil_id="${e.id}" data-nama="${e.nama}" data-wa="${e.wa}">
+                            <div class="list_hasil" data-hasil_id="${e.id}" data-nama="${e.nama}" data-order="${order}" data-wa="${e.wa}" data-hutang="${e.hutang}">
                                 <div class="d-flex justify-content-between">
                                     <span>${e.nama}</span>
-                                    <span class="text-muted">${e.role} [${e.wa}]</span>
+                                    <span class="text-muted">${e.role} [${e.hutang}]</span>
                                 </div>
                             </div>`;
                 });
@@ -501,16 +563,17 @@
         let id = $(this).data("hasil_id");
         let nama = $(this).data("nama");
         let wa = $(this).data("wa");
-
+        let order = $(this).data("order");
+        let hutang = $(this).data("hutang");
 
         const existing = $('.nama_hutang');
 
         if (existing.length === 0) {
 
-            $('.before_penghutang').after(penghutang(nama, wa, id));
+            $('.before_penghutang').after(penghutang(nama, wa, id, hutang));
         } else {
             $('.nama_hutang').val(nama);
-            $('.wa_hutang').val(wa);
+            $('.total_hutang').val(wa);
             $('.id_hutang').val(id);
         }
 
@@ -522,8 +585,8 @@
         let html = ``;
         if (simpan_hutang.length === 0) {
             html += `<div class="d-grid simpan_hutang mt-3">
-                        <button type="button" class="btn btn-outline-danger btn_simpan_hutang">SiMPAN HUTANG</button>
-                    </div>`;
+                            <button type="button" class="btn btn-outline-danger btn_simpan_hutang">SiMPAN HUTANG</button>
+                        </div>`;
             $('.before_hutang').after(html);
             $('.before_hutang').remove();
         } else {
@@ -531,7 +594,9 @@
             html += `<button type="button" class="btn btn-outline-danger btn_simpan_hutang">SiMPAN HUTANG</button>`;
             $('.simpan_hutang').html(html);
         }
+
     });
+
 
     $(document).on('click', '.btn_simpan_hutang', function(e) {
         e.preventDefault();
@@ -553,7 +618,6 @@
         })
 
     });
-
 
     // data transaksi
     const lists = (data, total, tahun, bulan, jenis) => {
@@ -581,45 +645,62 @@
                 <label>Bulan</label>
             </div>
 
-            <button class="btn btn-sm btn-secondary mb-2 lists" data-jenis="Transaksi">Show</button>
+            <button class="btn btn-sm btn-secondary mb-2 lists" data-jenis="All">Show</button>
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="text-warning nav-link lists ${(jenis=='Transaksi'?'active':'')}" data-jenis="Transaksi" href="#">Transaksi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="text-warning nav-link lists ${(jenis=='Hutang'?'active':'')}" data-jenis="Hutang" href="#">Hutang</a>
-                    </li>
-                </ul>
+                        <a class="text-warning nav-link lists ${(jenis=='All'?'active':'')}" data-jenis="All" href="#">All</a>
+                    </li>`;
+        options.forEach(e => {
+            if (e.value == "Snack" || e.value == "Makanan" || e.value == "Minuman") {
+                html += `<li class="nav-item">
+                                            <a class="text-warning nav-link lists ${(jenis==e.value?'active':'')}" data-jenis="${e.value}" href="#">${e.value}</a>
+                                        </li>`;
+
+            }
+
+        })
+        html += `</ul>
                 
-                <div class="mt-3" style="max-height:400px;overflow-y:auto">
+                <div class="mt-3">
                 <h4 class="text-center bg-secondary p-2">-[ ${angka(total)} ]-</h4>
 
                 <input class="form-control form-control-sm bg-dark text-light cari mb-2" placeholder="Cari">
-                    <table class="table table-sm table-dark" style="font-size:12px;">
+                <div style="max-height: 400px;overflow-y: auto;">
+                    <table class="table table-sm table-dark" style="font-size:12px">
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
-                                <th class="text-center">Lokasi</th>
                                 <th class="text-center">Tgl</th>
                                 <th class="text-center">Barang</th>
                                 <th class="text-center">Qty</th>
-                                <th class="text-center">Biaya</th>
-                            </tr>
+                                <th class="text-center">Biaya</th>`;
+        if (role == "Advisor" || role == "Root") {
+            html += `<th class="text-center">Biaya</th>`;
+
+        }
+        html += `</tr>
                         </thead>
                         <tbody class="tabel_search">`;
         data.forEach((e, i) => {
             html += `<tr>
                                 <th scope="row">${(i+1)}</th>
-                                <td class="text-start">${e.lokasi}</td>
                                 <td>${time_php_to_js(e.tgl)}</td>
                                 <td class="text-start">${e.barang}</td>
                                 <td>${angka(e.qty)}</td>
-                                <td class="text-end">${angka(e.biaya)}</td>
-                            </tr>`;
+                                <td class="text-end">${angka(e.biaya)}</td>`;
+            if (role == "Root" || role == "Advisor") {
+                if (e.barang.id == 0) {
+                    html += `<td>-</td>`;
+                } else {
+                    html += `<td><a data-barang_id="${e.barang_id}" href="" class="text-danger delete_data" data-id="${e.id}" style="text-decoration:none"><i class="fa-solid fa-circle-xmark"></i></a></td>`;
+
+                }
+            }
+            html += `</tr>`;
         })
         html += `</tbody>
                     </table>
-                </div>
+                </div> </div>
                 `;
 
         return html;
@@ -636,15 +717,13 @@
         post("transaksi/list", {
             tahun,
             bulan,
-            jenis
+            jenis,
+            options: ['Makanan', 'Minuman', 'Snack']
         }).then(res => {
             loading("close");
             datases = res.data;
-            if (res.data.length < 1) {
-                message("400", "Data tidak ada");
-                return;
-            }
             let html = build_html(jenis, "offcanvas");
+
             html += lists(res.data, res.data2, tahun, bulan, jenis);
 
             $(".body_canvas").html(html);
@@ -655,7 +734,6 @@
         })
 
     });
-
     $(document).on('keyup', '.cari', function(e) {
         e.preventDefault();
         let value = $(this).val().toLowerCase();
@@ -663,6 +741,251 @@
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
 
+    });
+    $(document).on('click', '.delete_data', function(e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+
+        let html = `<div class="text-center text-danger pb-4">
+                    <p style="font-size:12px">Yakin hapus?</p>
+                    <button class="btn btn-sm btn-secondary p-1 me-1 cancel_confirm">Batal</button>
+                    <button class="btn btn-sm btn-danger p-1 btn_delete_data" data-id="${id}" style="width: 50px;">Ya</button>
+                </div>`;
+        $(".message").html(html);
+        $(".message").show();
+    });
+    $(document).on('click', '.btn_delete_data', function(e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        let tahun = ($(".tahun").val() == undefined || $(".tahun").val() == "" ? "<?= date('Y'); ?>" : $(".tahun").val());
+        let bulan = ($(".bulan").val() == undefined || $(".bulan").val() == "" ? "<?= date('n'); ?>" : $(".bulan").val());
+        let jenis = "All";
+
+        post("transaksi/delete", {
+            id,
+            tahun,
+            bulan,
+            jenis,
+            options: ['Makanan', 'Minuman', 'Snack']
+        }).then(res => {
+            message(res.status, res.message);
+            canvas.show();
+            setTimeout(() => {
+                loading("close");
+                datases = res.data;
+
+                let html = build_html(jenis, "offcanvas");
+                html += lists(res.data, res.data2, tahun, bulan, jenis);
+
+                $(".body_canvas").html(html);
+
+                if ($('.tahun').length > 0) {
+                    canvas.show();
+                }
+            }, 500);
+        })
+    });
+    $(document).on('click', '.cashier', function(e) {
+        e.preventDefault();
+
+        datas = [];
+        post("transaksi/cashier", {
+            id: 0
+        }).then(res => {
+
+            loading("close");
+
+
+            let html = build_html("Kasir", "offcanvas");
+            html += `<input class="form-control form-control-sm bg-dark text-light cari mb-2" placeholder="Cari">
+                <div style="max-height: 600px;overflow-y: auto;">
+                    <table class="table table-sm table-dark" style="font-size:12px">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Tgl</th>
+                                <th class="text-center">Nama</th>
+                                <th class="text-center">Act</th>`;
+            html += `</tr>
+                        </thead>
+                        <tbody class="tabel_search">`;
+            res.data.forEach((e, i) => {
+                html += `<tr>
+                                <th scope="row">${(i+1)}</th>
+                                <td>${time_php_to_js(e.tgl, "d/m/Y H:i")}</td>
+                                <td class="text-start">${e.nama}</td>
+                                <td>
+                                <a data-no_nota="${e.no_nota}" href="" class="text-light add_item me-2" style="text-decoration:none"><i class="fa-solid fa-cart-plus"></i></a>
+                                <a data-no_nota="${e.no_nota}" href="" class="text-success pay" style="text-decoration:none"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                </td>`;
+                html += `</tr>`;
+            })
+            html += `</tbody>
+                    </table>
+                </div> </div>
+                `;
+
+            $(".body_canvas").html(html);
+            canvas.show();
+        })
+    });
+    $(document).on('click', '.add_item', function(e) {
+        e.preventDefault();
+
+        let no_nota = $(this).data("no_nota");
+        post("transaksi/add_item", {
+            no_nota
+        }).then(res => {
+
+            loading("close");
+            res.data.forEach(e => {
+                e.ket = "old";
+                datas.push(e);
+            })
+
+            $(".cari_barang").focus();
+            $(".next").html('<i class="fa-solid fa-cart-plus"></i> OK');
+            $(".next").attr('data-no_nota', no_nota);
+            $(".list_items").html(list_items());
+            $(".super_total").val(angka(super_total().biaya));
+            $('.next').removeClass('next').addClass('btn_add_item');
+
+            canvas.hide();
+        })
+    });
+    $(document).on('click', '.btn_add_item', function(e) {
+        e.preventDefault();
+
+        let no_nota = $(this).data("no_nota");
+        let is_new_item = false;
+        datas.forEach(e => {
+            if (e.ket === undefined) {
+                is_new_item = true;
+            }
+        })
+
+        if (is_new_item == false) {
+            message("400", "No new item");
+            return;
+        }
+
+        post("transaksi/btn_add_item", {
+            no_nota,
+            datas
+        }).then(res => {
+            loading("close");
+            message(res.status, res.message);
+
+            let html = build_html("Pesanan", "modal");
+
+            html += `
+            <div class="container">
+            <h6 class="text-warning">TOTAL: ${angka(res.data2)}</h6>
+                <div>Nama: ${res.data[0].nama}</div>
+                <div>Tgl: ${time_php_to_js(res.data[0].tgl)}</div>
+                <div>No. Nota: ${res.data[0].no_nota}</div>
+                <div style="max-height: 600px;overflow-y: auto;">
+                    <table class="table table-sm table-dark" style="font-size:12px">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Barang</th>
+                                <th>Harga</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Diskon</th>
+                                <th>Biaya</th>
+                                `;
+            html += `</tr>
+                        </thead>
+                        <tbody>`;
+            res.data.forEach((e, i) => {
+                html += `<tr>
+                                <th scope="row">${(i+1)}</th>
+                                <td class="text-start">${e.barang}</td>
+                                <td class="text-end">${angka(e.harga)}</td>
+                                <td class="text-end">${angka(e.qty)}</td>
+                                <td class="text-end">${angka(e.total)}</td>
+                                <td class="text-end">${angka(e.diskon)}</td>
+                                <td class="text-end">${angka(e.biaya)}</td>
+                               `;
+                html += `</tr>`;
+            })
+            html += `</tbody>
+                    </table>
+                </div> </div>
+                <div class="d-grid"><button class="btn btn-sm btn-light add_item_ends">Selesai</button></div>
+                </div>
+                `;
+
+            $(".body_modal_static").html(html);
+            modal_static.show();
+        })
+    });
+    $(document).on('click', '.add_item_ends', function(e) {
+        e.preventDefault();
+        location.reload();
+    });
+
+    $(document).on('click', '.pay', function(e) {
+        e.preventDefault();
+
+        let no_nota = $(this).data("no_nota");
+        post("transaksi/add_item", {
+            no_nota
+        }).then(res => {
+
+            loading("close");
+            datas = res.data;
+            let html = build_html("TRANSAKSI", "offcanvas");
+            html += next(super_total(), 'pay');
+
+
+            $('#main_canvas').on('shown.bs.offcanvas', function() {
+                $('.uang_pembayaran').trigger('focus').select();
+            });
+
+            html += `
+                <div class="mt-3">Nama: ${res.data[0].nama}</div>
+                <div>Tgl: ${time_php_to_js(res.data[0].tgl)}</div>
+                <div>No. Nota: ${res.data[0].no_nota}</div>
+                <div style="max-height: 300px;overflow-y: auto;">
+                    <table class="table table-sm table-dark" style="font-size:12px">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Barang</th>
+                                <th>Harga</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Diskon</th>
+                                <th>Biaya</th>
+                                `;
+            html += `</tr>
+                        </thead>
+                        <tbody>`;
+            res.data.forEach((e, i) => {
+                html += `<tr>
+                                <th scope="row">${(i+1)}</th>
+                                <td class="text-start">${e.barang}</td>
+                                <td class="text-end">${angka(e.harga)}</td>
+                                <td class="text-end">${angka(e.qty)}</td>
+                                <td class="text-end">${angka(e.total)}</td>
+                                <td class="text-end">${angka(e.diskon)}</td>
+                                <td class="text-end">${angka(e.biaya)}</td>
+                               `;
+                html += `</tr>`;
+            })
+            html += `</tbody>
+                    </table>
+                </div> </div>
+                `;
+
+            $(".body_canvas").html(html);
+            canvas.show();
+
+            $('.hutang').closest('div').remove();
+        })
     });
 </script>
 

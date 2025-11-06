@@ -189,12 +189,12 @@ function random_string($length = 14)
 
 function next_invoice($order = null)
 {
-
+    $lokasi = user()['lokasi'];
     $db = db('nota');
 
     $year  = date('Y');
     $month = date('m');
-    $prefix = "$year/$month/";
+    $prefix = "$year/$month/" . substr($lokasi, 0, 1) . "/";
 
     // Cari no_nota terakhir berdasarkan bulan ini
     $lastNota = $db->select('no_nota')

@@ -4,106 +4,154 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?= $judul; ?></title>
+    <title>Nota Pembelian BATEA</title>
     <style>
-        td,
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            color: #222;
+            display: flex;
+            justify-content: center;
+        }
+
+        .receipt {
+            padding: 1rem 2rem;
+            width: 360px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+        }
+
+        .header p {
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .line {
+            border-top: 1px dashed #888;
+            margin: 0.8rem 0;
+        }
+
+        .info {
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .info b {
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.2rem 0.3rem;
+            text-align: left;
+        }
+
         th {
-            font-size: 16px;
-            padding: 2px;
+            font-weight: 700;
+            border-bottom: 1px solid #333;
+        }
+
+        td.price,
+        td.qty,
+        td.total {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        tfoot tr:last-child td {
+            border-top: none;
         }
     </style>
 </head>
 
-<body style="font-size:16px;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;padding:0px;">
-    <div style="text-align: center;margin-bottom:20px">
-        <div style="font-weight: bold;font-size:26px"><?= strtoupper(profile()['nama']); ?></div>
-        <div style="font-size:small;">Karangmalang Sragen Jawa Tengah</div>
-        <div style="font-size: small;">0857-4661-6165</div>
-    </div>
-    <div style="padding: 0px; margin: 0;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <td style="width: 4px;">Nota</td>
-                <td style="width: 2px;">:</td>
-                <td><?= $no_nota; ?> [<?= $data[0]['lokasi']; ?>]</td>
-            </tr>
+<body style="font-size: 10px;">
+    <div class="receipt">
+        <div class="header">
+            <h1><?= profile()['nama']; ?></h1>
+            <p>Karangmalang Sragen Jawa Tengah<br /><?= profile()['cp']; ?></p>
+        </div>
 
-            <tr>
-                <td style="width: 4px;">Tgl</td>
-                <td style="width:2px">:</td>
-                <td><?= date("d-m-Y H:i:s"); ?></td>
-            </tr>
-            <tr>
-                <td style="width: 4px;">Kasir</td>
-                <td style="width: 2px;">:</td>
-                <td><?= $data[0]['petugas']; ?></td>
-            </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <td colspan="4" style="padding-top: 10px;border-bottom:1px solid grey"></td>
-            </tr>
-            <tr>
-                <th style="text-align: center;">Barang</th>
-                <th style="text-align: center;">Harga</th>
-                <th style="text-align: center;">Qty</th>
-                <th style="text-align: center;">Total</th>
-            </tr>
-            <tr>
-                <td colspan="4" style="border-top:1px solid grey"></td>
-            </tr>
-            <?php $total = 0;
-            $diskon = 0;
-            $biaya = 0; ?>
-            <?php foreach ($data as $i): ?>
-                <?php
-                $total += (int)$i['total'];
-                $diskon += (int)$i['diskon'];
-                $biaya += (int)$i['biaya'];
-                ?>
+        <div class="line"></div>
+
+        <div class="info">
+            <div><b>Nota:</b> <?= $no_nota; ?></div>
+            <div><b>Kasir:</b> <?= $data[0]['petugas']; ?></div>
+            <div><b>Tgl:</b> <?= date("d-m-Y H:i:s"); ?></div>
+        </div>
+
+        <div class="line"></div>
+
+        <table>
+            <thead>
                 <tr>
-                    <td><?= $i['barang']; ?></td>
-                    <td style="text-align: right;"><?= angka($i['harga']); ?></td>
-                    <td style="text-align: center;"><?= angka($i['qty']); ?></td>
-                    <td style="text-align: right;"><?= angka($i['total']); ?></td>
+                    <th>Barang</th>
+                    <th class="price">Harga</th>
+                    <th class="qty">Qty</th>
+                    <th class="total">Total</th>
                 </tr>
-            <?php endforeach; ?>
-            <tr>
-                <td colspan="4" style="border-top:1px solid grey"></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Sub Total</td>
-                <td colspan="2" style="text-align: right;"><?= angka($total); ?></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Diskon</td>
-                <td colspan="2" style="text-align: right;"><?= angka($diskon); ?></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Total</td>
-                <td colspan="2" style="text-align: right;"><?= angka($biaya); ?></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Uang</td>
-                <td colspan="2" style="text-align: right;"><?= angka($data[0]['uang']); ?></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Kembalian</td>
-                <td colspan="2" style="text-align: right;"><?= angka($data[0]['uang'] - $total); ?></td>
-            </tr>
-            <tr>
-                <td colspan="4" style="border-top:1px solid grey"></td>
-            </tr>
+            </thead>
+            <tbody>
+                <?php $total = 0;
+                $diskon = 0; ?>
+                <?php foreach ($data as $i): ?>
+                    <?php
+                    $total += (int)$i['total'];
+                    $diskon += (int)$i['diskon'];
+                    ?>
+                    <tr>
+                        <td><?= $i['barang']; ?></td>
+                        <td class="price"><?= angka($i['harga']); ?></td>
+                        <td class="qty"><?= angka($i['qty']); ?></td>
+                        <td class="total"><?= angka($i['total']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+
+                <tr>
+                    <td style="border-top: 1px solid black;" colspan="5"></td>
+                </tr>
+                <tr>
+                    <td colspan="3">Sub Total</td>
+                    <td class="total"><?= angka($total); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">Diskon</td>
+                    <td class="total"><?= angka($diskon); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">Total</td>
+                    <td class="total"><?= angka($total - $diskon); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">Uang</td>
+                    <td class="total"><?= angka($data[0]['uang']); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">Kembalian</td>
+                    <td class="total"><?= angka($data[0]['uang'] - ($total - $diskon)); ?></td>
+                </tr>
+            </tfoot>
         </table>
 
+        <div class="footer" style="text-align: center;margin-top:10px">
+            * Terima kasih atas kunjungan anda *
+        </div>
     </div>
-    <div style="text-align: center;margin-top:20px">- Terima Kasih -</div>
-
 </body>
 
 </html>

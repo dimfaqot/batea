@@ -11,9 +11,9 @@
     </div>
 
     <div class="p-2 flex-fill">
-        <div class="mb-1 text-center">PENGELUARAN</div>
+        <div class="mb-1 text-center">DATA</div>
         <div class="d-grid">
-            <button class="btn btn-light lists"><i class="fa-solid fa-list"></i></button>
+            <button class="btn btn-light lists" data-jenis="All"><i class="fa-solid fa-list"></i></button>
         </div>
     </div>
 </div>
@@ -25,15 +25,18 @@
     <div class="card text-bg-dark mb-3" data-menu="<?= $i['barang']; ?>">
         <div class="card-header"><?= ($k + 1) . ". " . $i['barang']; ?></div>
         <div class="card-body d-flex justify-content-between ps-4">
-            <div class="text-secondary"><small><?= ($i['jenis'] == "Kulakan" ? date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "] [" . angka($i['qty']) . "]" : date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "]"); ?></small></div>
+            <div class="text-secondary"><small><?= ($i['jenis'] !== "Kulakan" ? date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "] [" . angka($i['qty']) . "]" :  date("d/m/Y", $i['tgl']) . " [" . angka($i['harga']) . "]"); ?> <?= ($i['jenis'] == "Modal" ? '<i class="fa-solid fa-circle text-warning"></i>' : ($i['jenis'] == "Inv" ? '<i class="fa-solid text-success fa-circle"></i>' : '')); ?></small></div>
             <div>
-                <button class="btn btn-sm btn-light me-2 <?= (user()['role'] == "Root" ? "form_input" : ""); ?>" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
-                <button class="btn btn-sm btn-danger <?= (user()['role'] == "Root" ? "delete" : ""); ?>" data-id="<?= $i['id']; ?>" data-message="Yakin hapus data ini?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button>
+                <button class="btn btn-sm btn-light me-2 form_input" data-order="Edit" data-id="<?= $i['id']; ?>">Edit</button>
+                <!-- <button class="btn btn-sm btn-danger delete" data-id="<?= $i['id']; ?>" data-message="Yakin hapus?" data-tabel="<?= menu()['tabel']; ?>" data-is_reload="reload">Delete</button> -->
             </div>
         </div>
     </div>
 <?php endforeach; ?>
 <script>
+    let options = <?= json_encode(options('Kantin')); ?>;
+    const value_options = options.map(item => item.value);
+
     let form_input = (order, id) => {
 
         let data = {};
@@ -133,10 +136,10 @@
         let id = $(this).data("id");
         let order = $(this).data("order");
         let body_class_list = $('.body_list_barang');
-        let barangs = <?= json_encode(barang(['Makanan', 'Minuman', 'Snack', 'Kulakan', 'Donasi'])); ?>;
+
         post("pengeluaran/cari_barang", {
             text,
-            jenis: ["Makanan", "Minuman", "Snack", "Kulakan"]
+            jenis: value_options
         }, "No").then(res => {
             barangs = res.data;
             let barang_arr = res.data;
@@ -145,20 +148,18 @@
                 let html = '';
                 barang_arr.forEach(e => {
                     html += `
-                            <div class="list_barang" data-barang_id="${e.id}" data-jenis="${e.jenis}" data-harga="${e.harga}" data-order="${order}" data-id="${id}">
-                            <div class="d-flex justify-content-between">
-                                <span class="nama_barang_${e.id}">${e.barang}</span>
-                                <span class="text-muted">${angka(e.harga)} [${angka(e.qty)}]</span>
-                            </div>
-                        </div>`;
+                            <div class="list_barang" data-nama_barang="${e.barang}" data-barang_id="${e.id}" data-order="${order}" data-harga="${e.harga}" data-id="${id}">
+                                <div class="d-flex justify-content-between">
+                                    <span>${e.barang}</span>
+                                    <span class="text-muted">${angka(e.harga)} [${angka(e.qty)}]</span>
+                                </div>
+                            </div>`;
                 });
                 body_class_list.html(html).show();
             } else {
                 body_class_list.html('<div class="list_hasil text-muted">No data found</div>').show();
             }
         })
-
-
     });
 
 
@@ -166,9 +167,8 @@
         const id = $(this).data("id");
         const order = $(this).data("order");
         const barang_id = $(this).data("barang_id");
-        const jenis = $(this).data("jenis");
-        const hrg = $(this).data("harga");
-        const nama_barang = $(".nama_barang_" + barang_id).text();
+        const harga = $(this).data("harga");
+        const nama_barang = $(this).data("nama_barang");
 
         $(".barang").val(nama_barang);
 
@@ -181,8 +181,7 @@
             $('.barang').after('<input name="barang_id" value="' + barang_id + '" type="hidden">');
         }
 
-        let harga = $(".harga").val();
-        $(".harga").val((harga == "" ? 0 : (jenis == "Kulakan" ? hrg : harga)));
+        $(".harga").val(angka(harga));
         let qty = $(".qty").val();
         $(".qty").val((qty == "" ? 1 : qty));
         let diskon = $(".diskon").val();
@@ -223,7 +222,7 @@
     });
 
     // data pengeluaran
-    const lists = (data, total, tahun, bulan) => {
+    const lists = (data, total, tahun, bulan, jenis) => {
         let tahuns = <?= json_encode(tahuns('pengeluaran')); ?>;
         let bulans = <?= json_encode(bulans()); ?>;
         let html = '';
@@ -248,8 +247,20 @@
                 <label>Bulan</label>
             </div>
 
-            <button class="btn btn-sm btn-secondary mb-2 lists">Show</button>
-            
+            <button class="btn btn-sm btn-secondary mb-2 lists" data-jenis="All">Show</button>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="text-warning nav-link lists ${(jenis=='All'?'active':'')}" data-jenis="All" href="#">All</a>
+                    </li>`;
+        options.forEach(e => {
+            html += `<li class="nav-item">
+                            <a class="text-warning nav-link lists ${(jenis==e.value?'active':'')}" data-jenis="${e.value}" href="#">${e.value}</a>
+                        </li>`;
+
+        })
+
+        html += `</ul>
+                
                 <div class="mt-3">
                 <h4 class="text-center bg-secondary p-2">-[ ${angka(total)} ]-</h4>
 
@@ -260,8 +271,8 @@
                                 <th class="text-center">#</th>
                                 <th class="text-center">Tgl</th>
                                 <th class="text-center">Barang</th>
-                                <th class="text-center">qty</th>
-                                <th class="text-center">Biaya</th>
+                                <th class="text-center">Harga</th>
+                                <th class="text-center">Act</th>
                             </tr>
                         </thead>
                         <tbody class="tabel_search">`;
@@ -270,8 +281,8 @@
                                 <th scope="row">${(i+1)}</th>
                                 <td>${time_php_to_js(e.tgl)}</td>
                                 <td class="text-start">${e.barang}</td>
-                                <td>${angka(e.qty)}</td>
                                 <td class="text-end">${angka(e.biaya)}</td>
+                                <td class="text-center"><a class="edit text-warning" data-id="${e.id}"><i class="fa-solid fa-pen-to-square"></i></a></td>
                             </tr>`;
         })
         html += `</tbody>
@@ -288,19 +299,19 @@
         e.preventDefault();
         let tahun = ($(".tahun").val() == undefined || $(".tahun").val() == "" ? "<?= date('Y'); ?>" : $(".tahun").val());
         let bulan = ($(".bulan").val() == undefined || $(".bulan").val() == "" ? "<?= date('n'); ?>" : $(".bulan").val());
+        let jenis = $(this).data("jenis");
 
         post("pengeluaran/list", {
             tahun,
-            bulan
+            bulan,
+            jenis,
+            value_options
         }).then(res => {
             loading("close");
             datases = res.data;
-            if (res.data.length < 1) {
-                message("400", "Data tidak ada");
-                return;
-            }
-            let html = build_html("Pengeluaran", "offcanvas");
-            html += lists(res.data, res.data2, tahun, bulan);
+
+            let html = build_html(jenis, "offcanvas");
+            html += lists(res.data, res.data2, tahun, bulan, jenis);
 
             $(".body_canvas").html(html);
 
@@ -310,6 +321,8 @@
         })
 
     });
+
+
     $(document).on('keyup', '.cari', function(e) {
         e.preventDefault();
         let value = $(this).val().toLowerCase();

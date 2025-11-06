@@ -92,8 +92,7 @@ class Hutang extends BaseController
                 "total" => $i['total'],
                 "diskon" => $i['diskon'],
                 "biaya" => $i['biaya'],
-                "petugas" => user()['nama'],
-                "lokasi" => $i['lokasi'],
+                "petugas" => user()['nama']
             ])) {
                 gagal_js("Insert transaksi gagal");
             }
@@ -110,8 +109,7 @@ class Hutang extends BaseController
                 "diskon" => $i['diskon'],
                 "biaya" => $i['biaya'],
                 "petugas" => user()['nama'],
-                "lokasi" => $i['lokasi'],
-                "uang" => $uang,
+                "uang" => $uang
             ])) {
                 gagal_js("Insert nota gagal");
             }

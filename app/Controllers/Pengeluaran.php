@@ -14,28 +14,28 @@ class Pengeluaran extends BaseController
     }
     public function index(): string
     {
-        $total = db('pengeluaran')
-            ->selectSum('biaya')
-            ->where('lokasi', user()['lokasi'])
-            ->where("MONTH(FROM_UNIXTIME(tgl))", date('n'))
-            ->where("YEAR(FROM_UNIXTIME(tgl))", date('Y'))
-            ->orderBy('updated_at', 'DESC')
-            ->get()
-            ->getRowArray();
 
-        // Query data detail
-        $data = db('pengeluaran')
-            ->select('*')
-            ->where('lokasi', user()['lokasi'])
+        $jenises = [];
+        foreach (options('Kantin') as $i) {
+            $jenises[] = $i['value'];
+        }
+
+        $db = db('pengeluaran');
+        $db->select('*');
+        $db->where('lokasi', user()['lokasi']);
+        $db->whereIn('jenis', $jenises);
+        $data = $db->orderBy('tgl', 'DESC')
             ->where("MONTH(FROM_UNIXTIME(tgl))", date('n'))
             ->where("YEAR(FROM_UNIXTIME(tgl))", date('Y'))
-            ->orderBy('updated_at', 'DESC')
             ->get()
             ->getResultArray();
-        return view(menu()['controller'] . '/' . menu()['controller'] . "_" . 'landing', ['judul' => menu()['menu'], "data" => $data, 'total' => $total['biaya']]);
+        $total = array_sum(array_column($data, 'biaya'));
+
+        return view(menu()['controller'] . '/' . menu()['controller'] . "_" . 'landing', ['judul' => menu()['menu'], "data" => $data, 'total' => $total]);
     }
     public function add()
     {
+        $lokasi = user()['lokasi'];
         $barang_id = clear($this->request->getVar('barang_id'));
         $harga = angka_to_int(clear($this->request->getVar('harga')));
         $qty = angka_to_int(clear($this->request->getVar('qty')));
@@ -60,6 +60,7 @@ class Pengeluaran extends BaseController
             'jenis' => $barang['jenis'],
             'barang' => $barang['barang'],
             'barang_id' => $barang['id'],
+            'lokasi' => $lokasi,
             'harga'       => angka_to_int(clear($this->request->getVar('harga'))),
             'qty'       => $qty,
             'total'       => $harga * $qty,
@@ -67,7 +68,6 @@ class Pengeluaran extends BaseController
             'biaya'       => ($harga * $qty) - $diskon,
             'pj'       => $pj,
             'petugas'       => user()['nama'],
-            'lokasi'       => user()['lokasi'],
             'updated_at'       => time()
         ];
 
@@ -107,7 +107,7 @@ class Pengeluaran extends BaseController
         if ($diskon > ($harga * $qty)) return gagal(base_url(menu()['controller']), "Diskon over");
 
         // Update stok jika qty berubah
-        if ($barang['jenis'] == "Count") {
+        if ($barang['tipe'] !== "Count") {
             if ($data_lama['qty'] != $qty) {
                 $barang['qty'] = ($barang['qty'] - $data_lama['qty']) + $qty;
                 if (!db('barang')->where('id', $barang['id'])->update($barang)) {
@@ -145,13 +145,21 @@ class Pengeluaran extends BaseController
 
     public function list()
     {
+        $lokasi = user()['lokasi'];
         $tahun = clear($this->request->getVar('tahun'));
         $bulan = clear($this->request->getVar('bulan'));
+        $jenis = clear($this->request->getVar('jenis'));
+        $value_options = json_decode(json_encode($this->request->getVar('value_options')), true);
+        $db = db('pengeluaran');
+        $db->select('*');
+        $db->where('lokasi', $lokasi);
+        if ($jenis == "All") {
+            $db->whereIn('jenis', $value_options);
+        } else {
+            $db->where('jenis', $jenis);
+        }
+        $data = $db->orderBy('updated_at', 'DESC')
 
-        $data = db('pengeluaran')->select('*')
-            ->whereNotIn('jenis', ["Inv", "modal"])
-            ->where('lokasi', user()['lokasi'])
-            ->orderBy('tgl', 'DESC')
             ->where("MONTH(FROM_UNIXTIME(tgl))", $bulan)
             ->where("YEAR(FROM_UNIXTIME(tgl))", $tahun)
             ->get()
@@ -164,18 +172,18 @@ class Pengeluaran extends BaseController
 
     public function cari_barang()
     {
+        $lokasi = user()['lokasi'];
         $text = clear($this->request->getVar("text"));
         $jenis = json_decode(json_encode($this->request->getVar("jenis")), true);
-        $val = db('barang')->whereIn('jenis', $jenis)->like("barang", $text, "both")->orderBy('barang', 'ASC')->limit(7)->get()->getResultArray();
+        $val = db('barang')->where('link', '')->whereIn('jenis', $jenis)->like("barang", $text, "both")->orderBy('barang', 'ASC')->limit(7)->get()->getResultArray();
 
         $data = [];
 
         foreach ($val as $i) {
-            if ($i['lokasi'] == user()['lokasi']) {
+            if ($i['lokasi'] == $lokasi) {
                 $data[] = $i;
             }
         }
-
-        sukses_js("Ok", $data);
+        sukses_js("Ok", $val);
     }
 }

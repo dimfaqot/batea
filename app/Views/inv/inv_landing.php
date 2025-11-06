@@ -10,19 +10,31 @@
     </div>
 
     <div class="p-2 flex-fill">
-        <div class="mb-1 text-center">INV</div>
+        <div class="mb-1 text-center">DATA</div>
         <div class="d-grid">
-            <button class="btn btn-light lists" data-jenis="Inv"><i class="fa-solid fa-list"></i></button>
+            <button class="btn btn-light lists" data-jenis="All"><i class="fa-solid fa-list"></i></button>
         </div>
     </div>
 </div>
 
 
-<?php if (user()['role'] == "Root"): ?>
-    <input type="hidden" value="Modal" class="jenis">
-<?php else: ?>
-    <input type="hidden" value="Inv" class="jenis">
-<?php endif; ?>
+<div class="form-floating mb-3">
+    <select class="form-select bg-dark text-light border-secondary rounded jenis" required>
+        <option selected value="">Pilih Jenis</option>
+        <?php foreach (options('Inv') as $i): ?>
+            <?php if (user()['role'] == "Admin"): ?>
+                <?php if ($i['value'] == "Inv" || $i['value'] == "Service"): ?>
+                    <option value="<?= $i['value']; ?>"><?= $i['value']; ?></option>
+                <?php endif; ?>
+
+            <?php else: ?>
+                <option value="<?= $i['value']; ?>"><?= $i['value']; ?></option>
+
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </select>
+    <label class="text-secondary">Jenis</label>
+</div>
 <div class="form-floating mb-2">
     <input type="text" class="form-control bg-dark text-light border border-warning pj">
     <label class="text-secondary">Pj</label>
@@ -79,6 +91,7 @@
 <script>
     let barangs = [];
     let datas = [];
+    let role = "<?= user()['role']; ?>";
 
     const biaya = () => {
         let harga = $(".harga").val();
@@ -195,6 +208,8 @@
         }
 
         let barang = {};
+        barang["jenis"] = $(".jenis").val();
+        barang["pj"] = $(".pj").val();
         barang["barang"] = $(".barang").val();
         barang["harga"] = cb.harga;
         barang["qty"] = cb.qty;
@@ -260,12 +275,9 @@
 
     $(document).on('click', '.btn_save', function(e) {
         e.preventDefault();
-        let pj = $(".pj").val();
-        let jenis = $(".jenis").val();
+
         post("inv/add", {
-            datas,
-            pj,
-            jenis
+            datas
         }).then(res => {
             loading("close");
             message(res.status, res.message);
@@ -279,6 +291,7 @@
     });
 
     const lists = (data, total, tahun, bulan, jenis) => {
+        let options = <?= json_encode(options('Inv')); ?>;
         let tahuns = <?= json_encode(tahuns('pengeluaran')); ?>;
         let bulans = <?= json_encode(bulans()); ?>;
         let html = '';
@@ -303,15 +316,19 @@
                 <label>Bulan</label>
             </div>
 
-            <button class="btn btn-sm btn-secondary mb-2 lists" data-jenis="Inv">Show</button>
+            <button class="btn btn-sm btn-secondary mb-2 lists" data-jenis="All">Show</button>
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="text-warning nav-link lists ${(jenis=='Inv'?'active':'')}" data-jenis="Inv" href="#">Inv</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="text-warning nav-link lists ${(jenis=='Modal'?'active':'')}" data-jenis="Modal" href="#">Modal</a>
-                    </li>
-                </ul>
+                        <a class="text-warning nav-link lists ${(jenis=='All'?'active':'')}" data-jenis="All" href="#">All</a>
+                    </li>`;
+        options.forEach(e => {
+            html += `<li class="nav-item">
+                            <a class="text-warning nav-link lists ${(jenis==e.value?'active':'')}" data-jenis="${e.value}" href="#">${e.value}</a>
+                        </li>`;
+
+        })
+
+        html += `</ul>
                 
                 <div class="mt-3">
                 <h4 class="text-center bg-secondary p-2">-[ ${angka(total)} ]-</h4>
@@ -323,9 +340,11 @@
                                 <th class="text-center">#</th>
                                 <th class="text-center">Tgl</th>
                                 <th class="text-center">Barang</th>
-                                <th class="text-center">Harga</th>
-                                <th class="text-center">Act</th>
-                            </tr>
+                                <th class="text-center">Harga</th>`;
+        if (role == "Root" || role == "Advisor") {
+            html += `<th class="text-center">Act</th>`;
+        }
+        html += `</tr>
                         </thead>
                         <tbody class="tabel_search">`;
         data.forEach((e, i) => {
@@ -333,9 +352,12 @@
                                 <th scope="row">${(i+1)}</th>
                                 <td>${time_php_to_js(e.tgl)}</td>
                                 <td class="text-start">${e.barang}</td>
-                                <td class="text-end">${angka(e.biaya)}</td>
-                                <td class="text-center"><a class="edit text-warning" data-id="${e.id}"><i class="fa-solid fa-pen-to-square"></i></a></td>
-                            </tr>`;
+                                <td class="text-end">${(e.jenis=="Bisyaroh" && role=="Admin"?"-":angka(e.biaya))}</td>`;
+            if (role == "Root" || role == "Advisor") {
+                html += `<td class="text-center"><a class="edit text-warning" data-id="${e.id}"><i class="fa-solid fa-pen-to-square"></i></a></td>`;
+
+            }
+            html == `</tr>`;
         })
         html += `</tbody>
                     </table>
@@ -360,10 +382,6 @@
         }).then(res => {
             loading("close");
             datases = res.data;
-            if (res.data.length < 1) {
-                message("400", "Data tidak ada");
-                return;
-            }
             let html = build_html(jenis, "offcanvas");
             html += lists(res.data, res.data2, tahun, bulan, jenis);
 
@@ -390,8 +408,15 @@
         let html = `<div class="form-floating mb-3">
                         <select class="form-select bg-dark text-light border-secondary rounded edit_jenis" name="jenis">`;
         jenis.forEach(e => {
-            html += `<option ${(e.value==data.jenis?"selected":"")} value="${e.value}">${e.value}</option>`;
+            if (role == "Admin") {
+                if (e.value == "Inv" || e.value == "Service") {
+                    html += `<option ${(e.value==data.jenis?"selected":"")} value="${e.value}">${e.value}</option>`;
 
+                }
+            } else {
+                html += `<option ${(e.value==data.jenis?"selected":"")} value="${e.value}">${e.value}</option>`;
+
+            }
         })
         html += `</select>
                         <label class="text-secondary">Jenis</label>

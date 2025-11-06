@@ -25,6 +25,7 @@
 <script>
     let detail = (data, total_biaya) => {
         let html = `<div class="bg-secondary fw-bold p-2 mb-2">TOTAL: ${angka(total_biaya)}</div>
+                        <div style="max-height: 600px;overflow-y: auto;">
                         <table class="table table-dark table-bordered" style="font-size: 10px;">
                             <thead>
                                 <tr>
@@ -50,7 +51,7 @@
                     </tr>`;
         });
         html += `</tbody>
-                        </table>`;
+                        </table></div>`;
 
         return html;
     }
@@ -84,7 +85,7 @@
 
                 let text = "_Assalamualaikum Wr. Wb._%0a";
                 text += "Yth. *" + res.data2.nama + '*%0a%0a';
-                text += 'Tagihan Anda di Hayu Batea:%0a%0a';
+                text += 'Tagihan Anda di <?= profile()['nama']; ?>:%0a%0a';
                 text += '*No. -- Tgl -- Barang -- Harga -- Qty -- Total -- Diskon -- Biaya*%0a'
 
                 let x = 1;
