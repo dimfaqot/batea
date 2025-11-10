@@ -184,6 +184,6 @@ class Pengeluaran extends BaseController
                 $data[] = $i;
             }
         }
-        sukses_js("Ok", $val);
+        sukses_js("Ok", $data);
     }
 }

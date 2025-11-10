@@ -238,7 +238,7 @@ class Transaksi extends BaseController
                 $data[] = $i;
             }
         }
-        sukses_js("Ok", $val);
+        sukses_js("Ok", $data);
     }
     public function add_user()
     {
