@@ -67,7 +67,7 @@ class Transaksi extends BaseController
                     $exp = explode(",", $barang['link']);
 
                     foreach ($exp as $x) {
-                        $val = db('barang')->where('barang', $x)->get()->getRowArray();
+                        $val = db('barang')->where('id', $x)->get()->getRowArray();
 
                         if (!$val) {
                             gagal_js("Link barang null");
@@ -168,7 +168,7 @@ class Transaksi extends BaseController
                 $exp = explode(",", $barang['link']);
 
                 foreach ($exp as $x) {
-                    $val = db('barang')->where('barang', $x)->get()->getRowArray();
+                    $val = db('barang')->where('id', $x)->get()->getRowArray();
 
                     if (!$val) {
                         gagal_js("Link barang null");
